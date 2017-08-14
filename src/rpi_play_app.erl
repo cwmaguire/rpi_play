@@ -1,4 +1,4 @@
--module(rpi_play).
+-module(rpi_play_app).
 
 -behaviour(application).
 
@@ -27,7 +27,7 @@
 %% @end
 %%--------------------------------------------------------------------
 start(_StartType, _StartArgs) ->
-    'TopSupervisor':start_link().
+    rpi_play_sup:start_link().
 
 %%--------------------------------------------------------------------
 %% @private
