@@ -1,4 +1,4 @@
--module(rpi_play).
+-module(rpi_play_app).
 
 -behaviour(application).
 
