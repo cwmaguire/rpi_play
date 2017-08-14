@@ -34,7 +34,7 @@ start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 init([]) ->
-    {ok, Epigpio} = epigpio_api:start_pigpio_client(self()),
+    {ok, Epigpio} = epigpio_api:start_pigpio(self()),
     {ok, #state{epigpio = Epigpio}}.
 
 handle_call(_Request, _From, State) ->
