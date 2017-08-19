@@ -7,9 +7,9 @@
 
 %% API
 -export([start_link/0]).
--export([set_output_mode/0]).
--export([power_on/0]).
--export([power_off/0]).
+-export([set_output_mode/1]).
+-export([power_on/1]).
+-export([power_off/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -21,14 +21,14 @@
 
 -record(state, {epigpio :: pid()}).
 
-set_output_mode() ->
-    gen_server:cast(?MODULE, set_output_mode).
+set_output_mode(Pin) ->
+    gen_server:cast(?MODULE, {set_output_mode, Pin}).
 
-power_on() ->
-    gen_server:cast(?MODULE, power_on).
+power_on(Pin) ->
+    gen_server:cast(?MODULE, {power_on, Pin}).
 
-power_off() ->
-    gen_server:cast(?MODULE, power_off).
+power_off(Pin) ->
+    gen_server:cast(?MODULE, {power_off, Pin}).
 
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
@@ -41,14 +41,14 @@ handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
 
-handle_cast(set_output_mode, State = #state{epigpio = Epigpio}) ->
-    epigpio:set_mode(Epigpio, 4, 1),
+handle_cast({set_output_mode, Pin}, State = #state{epigpio = Epigpio}) ->
+    epigpio:set_mode(Epigpio, Pin, 1),
     {noreply, State};
-handle_cast(power_on, State = #state{epigpio = Epigpio}) ->
-    epigpio:write(Epigpio, 4, 1),
+handle_cast({power_on, Pin}, State = #state{epigpio = Epigpio}) ->
+    epigpio:write(Epigpio, Pin, 1),
     {noreply, State};
-handle_cast(power_off, State = #state{epigpio = Epigpio}) ->
-    epigpio:write(Epigpio, 4, 0),
+handle_cast({power_off, Pin}, State = #state{epigpio = Epigpio}) ->
+    epigpio:write(Epigpio, Pin, 0),
     {noreply, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
