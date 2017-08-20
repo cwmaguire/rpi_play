@@ -50,7 +50,7 @@ handle_call(_Request, _From, State) ->
     {reply, Reply, State}.
 
 handle_cast({set_output_mode, Pin}, State = #state{epigpio = Epigpio}) ->
-    epigpio:set_mode(Epigpio, Pin, 1),
+    epigpio:setmode(Epigpio, Pin, 1),
     {noreply, State};
 handle_cast({power_on, Pin}, State = #state{epigpio = Epigpio}) ->
     epigpio:write(Epigpio, Pin, 1),
