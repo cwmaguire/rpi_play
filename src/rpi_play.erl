@@ -36,7 +36,7 @@ pwm(Pin, DutyCycle) ->
     gen_server:cast(?MODULE, {pwm, Pin, DutyCycle}).
 
 pwm_range(Pin, Range) ->
-    gen_server:cast(?MODULE, {pwm, Pin, DutyCycle}).
+    gen_server:cast(?MODULE, {pwm, Pin, Range}).
 
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
