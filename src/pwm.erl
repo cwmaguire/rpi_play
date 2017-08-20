@@ -37,5 +37,6 @@ cycle(Pin, Step, Current) ->
         false ->
             okay;
         _ ->
+            timer:sleep(40),
             cycle(Pin, Step, Current + Step)
     end.
