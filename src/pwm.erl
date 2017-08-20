@@ -7,22 +7,27 @@
 -define(BLUE, 19).
 
 go() ->
-    Red = spawn(fun() -> cycle(?RED, 5, 0) end),
-    Green = spawn(fun() -> cycle(?GREEN, 4, 0) end),
-    Blue = spawn(fun() -> cycle(?BLUE, 3, 0) end),
-    {stop_fun(Red, Green, Blue), {Red, Green, Blue}}.
+    go([{?RED, 5, 100},
+        {?GREEN, 4, 100},
+        {?BLUE, 3, 100}]).
 
-stop_fun(Red, Green, Blue) ->
+go(Specs) ->
+    [rpi_play:set_output_mode(Pin) || {Pin, _, _} <- Specs],
+    Pids = [spawn(fun() -> cycle(P, St, Sl, 0) end) || {P, St, Sl} <- Specs],
+    %Red = spawn(fun() -> cycle(?RED, 5, 1000, 0) end),
+    %Green = spawn(fun() -> cycle(?GREEN, 4, 500, 0) end),
+    %Blue = spawn(fun() -> cycle(?BLUE, 3, 2000, 0) end),
+    {stop_fun(Pids), Pids}.
+
+stop_fun(Pids) ->
     fun() ->
-         Red ! stop,
-         Green ! stop,
-         Blue ! stop
+         [Pid ! stop || Pid <- Pids]
     end.
 
-cycle(Pin, Step, TooHigh) when TooHigh + Step > 255 ->
-    cycle(Pin, Step, 0);
-cycle(Pin, Step, Current) ->
-    rpi_play:pwm(Pin, Step),
+cycle(Pin, Step, Sleep, TooHigh) when TooHigh + Step > 255 ->
+    cycle(Pin, Step, Sleep, 0);
+cycle(Pin, Step, Sleep, Current) ->
+    rpi_play:pwm(Pin, Current),
     ShouldContinue =
     receive
         stop ->
@@ -37,6 +42,6 @@ cycle(Pin, Step, Current) ->
         false ->
             okay;
         _ ->
-            timer:sleep(40),
-            cycle(Pin, Step, Current + Step)
+            timer:sleep(Sleep),
+            cycle(Pin, Step, Sleep, Current + Step)
     end.
