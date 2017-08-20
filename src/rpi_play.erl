@@ -10,6 +10,7 @@
 -export([set_output_mode/1]).
 -export([power_on/1]).
 -export([power_off/1]).
+-export([pwm/2]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -30,6 +31,9 @@ power_on(Pin) ->
 power_off(Pin) ->
     gen_server:cast(?MODULE, {power_off, Pin}).
 
+pwm(Pin, DutyCycle) ->
+    gen_server:cast(?MODULE, {pwm, Pin, DutyCycle}).
+
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
@@ -49,6 +53,9 @@ handle_cast({power_on, Pin}, State = #state{epigpio = Epigpio}) ->
     {noreply, State};
 handle_cast({power_off, Pin}, State = #state{epigpio = Epigpio}) ->
     epigpio:write(Epigpio, Pin, 0),
+    {noreply, State};
+handle_cast({pwm, Pin, DutyCycle}, State = #state{epigpio = Epigpio}) ->
+    epigpio:pwm(Epigpio, Pin, DutyCycle),
     {noreply, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
